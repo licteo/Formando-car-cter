@@ -3,8 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Héroes del Carácter: El Reto de los 21 Días</title>
+    <title>Héroes del Carácter: 21 Días</title>
+
+    <link rel="icon" type="image/png" sizes="192x192" href="icono.png">
+    <link rel="apple-touch-icon" href="icono.png">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
     <style>
         :root {
             --primary: #6366f1;
@@ -17,9 +25,9 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--bg); color: var(--text); padding-bottom: 100px; }
+        body { background: var(--bg); color: var(--text); padding-bottom: 100px; touch-action: manipulation; }
 
-        /* HEADER & STATS */
+        /* DASHBOARD DE ESTADÍSTICAS */
         .header-stats {
             background: var(--card); padding: 20px; border-bottom: 3px solid var(--primary);
             position: sticky; top: 0; z-index: 100;
@@ -32,19 +40,19 @@
         .bar-bg { background: #334155; height: 10px; border-radius: 5px; overflow: hidden; margin-bottom: 8px; }
         .bar-fill { height: 100%; transition: 0.5s ease-out; }
 
-        .perfiles-nav { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; }
+        .perfiles-nav { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
         .perfil-btn { 
-            background: #334155; color: white; border: none; padding: 8px 15px; 
-            border-radius: 8px; cursor: pointer; white-space: nowrap; font-size: 0.8rem;
+            background: #334155; color: white; border: none; padding: 8px 18px; 
+            border-radius: 20px; cursor: pointer; white-space: nowrap; font-size: 0.8rem;
         }
         .perfil-btn.active { background: var(--primary); box-shadow: 0 0 10px var(--primary); }
 
         .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
 
-        /* MISIONES (CARDS) */
+        /* MISIONES 21 DÍAS */
         .mision-card {
             background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 20px;
-            border: 1px solid #334155; position: relative; overflow: hidden;
+            border: 1px solid #334155; position: relative;
         }
         .mision-tag { position: absolute; top: 0; right: 20px; background: var(--primary); padding: 4px 10px; border-radius: 0 0 8px 8px; font-size: 0.6rem; font-weight: bold; }
         
@@ -54,9 +62,9 @@
             align-items: center; justify-content: center; font-size: 0.7rem; cursor: pointer;
             transition: 0.3s; border: 1px solid transparent;
         }
-        .circle.complete { background: var(--xp); color: white; box-shadow: 0 0 10px var(--xp); }
+        .circle.complete { background: var(--xp); color: white; box-shadow: 0 0 8px var(--xp); }
         .circle.today { border: 2px solid var(--gold); animation: pulse 2s infinite; }
-        .circle.locked { opacity: 0.3; cursor: not-allowed; }
+        .circle.locked { opacity: 0.2; cursor: not-allowed; }
 
         /* PAUSA SAGRADA OVERLAY */
         #pausaOverlay {
@@ -64,7 +72,7 @@
             z-index: 1000; flex-direction: column; align-items: center; justify-content: center;
         }
         .timer-circle {
-            width: 220px; height: 220px; border-radius: 50%; border: 8px solid var(--primary);
+            width: 200px; height: 200px; border-radius: 50%; border: 8px solid var(--primary);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); margin: 20px;
         }
@@ -74,11 +82,12 @@
             position: fixed; bottom: 25px; right: 25px; width: 65px; height: 65px;
             background: var(--primary); border-radius: 50%; display: flex; align-items: center;
             justify-content: center; font-size: 2rem; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-            z-index: 500;
+            z-index: 500; border: 2px solid rgba(255,255,255,0.2);
         }
 
-        .muro { background: var(--card); padding: 15px; border-radius: 16px; margin-top: 30px; }
-        .muro-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #334155; }
+        .muro { background: var(--card); padding: 15px; border-radius: 16px; margin-top: 30px; border: 1px solid #334155; }
+        .muro h3 { color: var(--gold); margin-bottom: 10px; font-size: 1rem; text-align: center; }
+        .muro-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #334155; }
 
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
     </style>
@@ -89,7 +98,7 @@
         <div class="user-info">
             <div class="avatar" id="current-avatar">🛡️</div>
             <div class="stat-bars">
-                <h2 id="current-user-name">Héroe</h2>
+                <h2 id="current-user-name">Cargando...</h2>
                 <div class="bar-label"><span>Rango: <span id="rango-txt">Novato</span></span> <span>Nivel <span id="lvl-txt">1</span></span></div>
                 <div class="bar-bg"><div id="xp-bar" class="bar-fill" style="background: var(--xp); width: 0%;"></div></div>
                 <div class="bar-label"><span>Energía Vital (HP)</span> <span id="hp-txt">100%</span></div>
@@ -106,7 +115,7 @@
         <div id="misiones-lista"></div>
 
         <div class="muro">
-            <h3>🏆 Muro de la Fama</h3>
+            <h3>🏆 MURO DE LA FAMA FAMILIAR</h3>
             <div id="muro-contenido"></div>
         </div>
     </div>
@@ -114,19 +123,20 @@
     <div class="fab-pausa" onclick="abrirPausa()">🛡️</div>
 
     <div id="pausaOverlay">
-        <div style="color: var(--gold); letter-spacing: 2px;">PAUSA SAGRADA</div>
+        <div style="color: var(--gold); letter-spacing: 2px; font-weight: bold;">PAUSA SAGRADA</div>
         <div class="timer-circle" id="circuloAnim">
             <div class="timer-num" id="contadorPausa">0</div>
         </div>
-        <div id="instruccionPausa" style="font-size: 1.5rem; color: var(--xp);">¿Listo?</div>
-        <button id="btnStartRespirar" onclick="iniciarCiclo478()" style="margin-top:20px; padding:10px 20px; border-radius:20px; border:none; background:var(--primary); color:white; font-weight:bold; cursor:pointer;">EMPEZAR</button>
+        <div id="instruccionPausa" style="font-size: 1.5rem; color: var(--xp); height: 1.5em;">¿Listo para centrarte?</div>
+        <button id="btnStartRespirar" onclick="iniciarCiclo478()" style="margin-top:20px; padding:12px 30px; border-radius:25px; border:none; background:var(--primary); color:white; font-weight:bold; cursor:pointer;">EMPEZAR</button>
     </div>
 
     <script>
         const ICONOS = { "Autodominio": "🛡️", "Orden": "🧹", "Responsabilidad": "⚖️", "Integridad": "💎", "Aprendizaje": "📚" };
         const RANGOS = ["Novato", "Aprendiz", "Guerrero", "Caballero", "Maestro", "Leyenda"];
         
-        let db = JSON.parse(localStorage.getItem('heroes_caracter_v3')) || {
+        // Base de Datos Estructurada
+        let db = JSON.parse(localStorage.getItem('heroes_final_db')) || {
             usuarios: {
                 "Papá": { xp: 0, hp: 100, misiones: [], avatar: "🦁" },
                 "Mamá": { xp: 0, hp: 100, misiones: [], avatar: "🦋" },
@@ -136,6 +146,7 @@
             actual: "Papá"
         };
 
+        // Audio Sintetizado para evitar errores de archivos
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playTick(freq) {
             const osc = audioCtx.createOscillator();
@@ -147,12 +158,12 @@
         }
 
         function guardar() {
-            localStorage.setItem('heroes_caracter_v3', JSON.stringify(db));
+            localStorage.setItem('heroes_final_db', JSON.stringify(db));
             render();
         }
 
         function crearMision() {
-            const nombre = prompt("¿Nombre de la Misión?");
+            const nombre = prompt("¿Qué misión (hábito) vas a emprender?");
             const prog = prompt("Programa: Autodominio, Orden, Responsabilidad, Integridad o Aprendizaje");
             if(!nombre || !prog) return;
             db.usuarios[db.actual].misiones.push({
@@ -165,7 +176,9 @@
             const u = db.usuarios[db.actual];
             const m = u.misiones.find(x => x.id === misionId);
             const hoy = Math.floor((new Date().setHours(0,0,0,0) - m.inicio) / 86400000) + 1;
-            if(dia > hoy) return alert("Aún no llegamos a ese día.");
+            
+            if(dia > hoy) return alert("Paciencia, Héroe. Este día aún no llega.");
+            
             if(!m.logs.includes(dia)) {
                 m.logs.push(dia);
                 u.xp += 100;
@@ -181,24 +194,21 @@
 
         async function iniciarCiclo478() {
             document.getElementById('btnStartRespirar').style.display = 'none';
-            const cont = document.getElementById('contadorPausa');
-            const inst = document.getElementById('instruccionPausa');
-            const circ = document.getElementById('circuloAnim');
+            const cont = document.getElementById('contadorPausa'), inst = document.getElementById('instruccionPausa'), circ = document.getElementById('circuloAnim');
 
             for(let c=0; c<2; c++) {
-                // Inhala 4
                 inst.innerText = "INHALA"; circ.style.transform = "scale(1.3)"; circ.style.borderColor = "#10b981";
                 for(let i=1; i<=4; i++) { cont.innerText = i; playTick(440); await new Promise(r => setTimeout(r, 1000)); }
-                // Mantén 7
+                
                 inst.innerText = "MANTÉN"; circ.style.borderColor = "#f59e0b";
                 for(let i=1; i<=7; i++) { cont.innerText = i; playTick(554); await new Promise(r => setTimeout(r, 1000)); }
-                // Exhala 8
+                
                 inst.innerText = "EXHALA"; circ.style.transform = "scale(1)"; circ.style.borderColor = "#6366f1";
                 for(let i=1; i<=8; i++) { cont.innerText = i; playTick(330); await new Promise(r => setTimeout(r, 1000)); }
             }
             
-            inst.innerText = "¡Sincronizado!";
-            db.usuarios[db.actual].hp = Math.min(100, db.usuarios[db.actual].hp + 10);
+            inst.innerText = "¡Paz Alcanzada!";
+            db.usuarios[db.actual].hp = Math.min(100, db.usuarios[db.actual].hp + 5);
             guardar();
             setTimeout(() => { 
                 document.getElementById('pausaOverlay').style.display = 'none'; 
