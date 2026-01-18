@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Héroes del Carácter: El Reto de los 21 Días</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --gold: #f59e0b;
+            --hp: #ef4444;
+            --xp: #10b981;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg); color: var(--text); padding-bottom: 100px; }
+
+        /* HEADER & STATS */
+        .header-stats {
+            background: var(--card); padding: 20px; border-bottom: 3px solid var(--primary);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .user-info { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .avatar { width: 60px; height: 60px; background: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 2px solid var(--gold); }
+        
+        .stat-bars { flex-grow: 1; }
+        .bar-label { font-size: 0.7rem; font-weight: bold; margin-bottom: 2px; display: flex; justify-content: space-between; }
+        .bar-bg { background: #334155; height: 10px; border-radius: 5px; overflow: hidden; margin-bottom: 8px; }
+        .bar-fill { height: 100%; transition: 0.5s ease-out; }
+
+        .perfiles-nav { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; }
+        .perfil-btn { 
+            background: #334155; color: white; border: none; padding: 8px 15px; 
+            border-radius: 8px; cursor: pointer; white-space: nowrap; font-size: 0.8rem;
+        }
+        .perfil-btn.active { background: var(--primary); box-shadow: 0 0 10px var(--primary); }
+
+        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
+
+        /* MISIONES (CARDS) */
+        .mision-card {
+            background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 20px;
+            border: 1px solid #334155; position: relative; overflow: hidden;
+        }
+        .mision-tag { position: absolute; top: 0; right: 20px; background: var(--primary); padding: 4px 10px; border-radius: 0 0 8px 8px; font-size: 0.6rem; font-weight: bold; }
+        
+        .grid-21 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 15px; }
+        .circle {
+            aspect-ratio: 1; border-radius: 8px; background: #334155; display: flex;
+            align-items: center; justify-content: center; font-size: 0.7rem; cursor: pointer;
+            transition: 0.3s; border: 1px solid transparent;
+        }
+        .circle.complete { background: var(--xp); color: white; box-shadow: 0 0 10px var(--xp); }
+        .circle.today { border: 2px solid var(--gold); animation: pulse 2s infinite; }
+        .circle.locked { opacity: 0.3; cursor: not-allowed; }
+
+        /* PAUSA SAGRADA OVERLAY */
+        #pausaOverlay {
+            display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.98); 
+            z-index: 1000; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .timer-circle {
+            width: 220px; height: 220px; border-radius: 50%; border: 8px solid var(--primary);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); margin: 20px;
+        }
+        .timer-num { font-size: 4rem; font-weight: bold; }
+
+        .fab-pausa {
+            position: fixed; bottom: 25px; right: 25px; width: 65px; height: 65px;
+            background: var(--primary); border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 2rem; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            z-index: 500;
+        }
+
+        .muro { background: var(--card); padding: 15px; border-radius: 16px; margin-top: 30px; }
+        .muro-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #334155; }
+
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    </style>
+</head>
+<body>
+
+    <div class="header-stats">
+        <div class="user-info">
+            <div class="avatar" id="current-avatar">🛡️</div>
+            <div class="stat-bars">
+                <h2 id="current-user-name">Héroe</h2>
+                <div class="bar-label"><span>Rango: <span id="rango-txt">Novato</span></span> <span>Nivel <span id="lvl-txt">1</span></span></div>
+                <div class="bar-bg"><div id="xp-bar" class="bar-fill" style="background: var(--xp); width: 0%;"></div></div>
+                <div class="bar-label"><span>Energía Vital (HP)</span> <span id="hp-txt">100%</span></div>
+                <div class="bar-bg"><div id="hp-bar" class="bar-fill" style="background: var(--hp); width: 100%;"></div></div>
+            </div>
+        </div>
+        <div class="perfiles-nav" id="perfil-selector"></div>
+    </div>
+
+    <div class="container">
+        <button onclick="crearMision()" style="width:100%; padding:15px; border-radius:12px; border:2px dashed var(--primary); background:none; color:var(--primary); font-weight:bold; cursor:pointer; margin-bottom:20px;">
+            + INICIAR NUEVA MISIÓN
+        </button>
+        <div id="misiones-lista"></div>
+
+        <div class="muro">
+            <h3>🏆 Muro de la Fama</h3>
+            <div id="muro-contenido"></div>
+        </div>
+    </div>
+
+    <div class="fab-pausa" onclick="abrirPausa()">🛡️</div>
+
+    <div id="pausaOverlay">
+        <div style="color: var(--gold); letter-spacing: 2px;">PAUSA SAGRADA</div>
+        <div class="timer-circle" id="circuloAnim">
+            <div class="timer-num" id="contadorPausa">0</div>
+        </div>
+        <div id="instruccionPausa" style="font-size: 1.5rem; color: var(--xp);">¿Listo?</div>
+        <button id="btnStartRespirar" onclick="iniciarCiclo478()" style="margin-top:20px; padding:10px 20px; border-radius:20px; border:none; background:var(--primary); color:white; font-weight:bold; cursor:pointer;">EMPEZAR</button>
+    </div>
+
+    <script>
+        const ICONOS = { "Autodominio": "🛡️", "Orden": "🧹", "Responsabilidad": "⚖️", "Integridad": "💎", "Aprendizaje": "📚" };
+        const RANGOS = ["Novato", "Aprendiz", "Guerrero", "Caballero", "Maestro", "Leyenda"];
+        
+        let db = JSON.parse(localStorage.getItem('heroes_caracter_v3')) || {
+            usuarios: {
+                "Papá": { xp: 0, hp: 100, misiones: [], avatar: "🦁" },
+                "Mamá": { xp: 0, hp: 100, misiones: [], avatar: "🦋" },
+                "Hijo 1": { xp: 0, hp: 100, misiones: [], avatar: "🦅" },
+                "Hijo 2": { xp: 0, hp: 100, misiones: [], avatar: "🦊" }
+            },
+            actual: "Papá"
+        };
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playTick(freq) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.frequency.value = freq;
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        function guardar() {
+            localStorage.setItem('heroes_caracter_v3', JSON.stringify(db));
+            render();
+        }
+
+        function crearMision() {
+            const nombre = prompt("¿Nombre de la Misión?");
+            const prog = prompt("Programa: Autodominio, Orden, Responsabilidad, Integridad o Aprendizaje");
+            if(!nombre || !prog) return;
+            db.usuarios[db.actual].misiones.push({
+                id: Date.now(), nombre, categoria: prog, inicio: new Date().setHours(0,0,0,0), logs: []
+            });
+            guardar();
+        }
+
+        function marcarDia(misionId, dia) {
+            const u = db.usuarios[db.actual];
+            const m = u.misiones.find(x => x.id === misionId);
+            const hoy = Math.floor((new Date().setHours(0,0,0,0) - m.inicio) / 86400000) + 1;
+            if(dia > hoy) return alert("Aún no llegamos a ese día.");
+            if(!m.logs.includes(dia)) {
+                m.logs.push(dia);
+                u.xp += 100;
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.8 } });
+            }
+            guardar();
+        }
+
+        function abrirPausa() { 
+            document.getElementById('pausaOverlay').style.display = 'flex';
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        async function iniciarCiclo478() {
+            document.getElementById('btnStartRespirar').style.display = 'none';
+            const cont = document.getElementById('contadorPausa');
+            const inst = document.getElementById('instruccionPausa');
+            const circ = document.getElementById('circuloAnim');
+
+            for(let c=0; c<2; c++) {
+                // Inhala 4
+                inst.innerText = "INHALA"; circ.style.transform = "scale(1.3)"; circ.style.borderColor = "#10b981";
+                for(let i=1; i<=4; i++) { cont.innerText = i; playTick(440); await new Promise(r => setTimeout(r, 1000)); }
+                // Mantén 7
+                inst.innerText = "MANTÉN"; circ.style.borderColor = "#f59e0b";
+                for(let i=1; i<=7; i++) { cont.innerText = i; playTick(554); await new Promise(r => setTimeout(r, 1000)); }
+                // Exhala 8
+                inst.innerText = "EXHALA"; circ.style.transform = "scale(1)"; circ.style.borderColor = "#6366f1";
+                for(let i=1; i<=8; i++) { cont.innerText = i; playTick(330); await new Promise(r => setTimeout(r, 1000)); }
+            }
+            
+            inst.innerText = "¡Sincronizado!";
+            db.usuarios[db.actual].hp = Math.min(100, db.usuarios[db.actual].hp + 10);
+            guardar();
+            setTimeout(() => { 
+                document.getElementById('pausaOverlay').style.display = 'none'; 
+                document.getElementById('btnStartRespirar').style.display = 'block';
+            }, 2000);
+        }
+
+        function render() {
+            const u = db.usuarios[db.actual];
+            document.getElementById('current-user-name').innerText = db.actual;
+            document.getElementById('current-avatar').innerText = u.avatar;
+            const lvl = Math.floor(u.xp / 500) + 1;
+            document.getElementById('lvl-txt').innerText = lvl;
+            document.getElementById('rango-txt').innerText = RANGOS[Math.min(lvl-1, 5)];
+            document.getElementById('xp-bar').style.width = `${(u.xp % 500) / 5}%`;
+            document.getElementById('hp-bar').style.width = `${u.hp}%`;
+            document.getElementById('hp-txt').innerText = u.hp + "%";
+
+            const selector = document.getElementById('perfil-selector');
+            selector.innerHTML = Object.keys(db.usuarios).map(n => `<button class="perfil-btn ${n===db.actual?'active':''}" onclick="db.actual='${n}'; render();">${n}</button>`).join('');
+
+            const lista = document.getElementById('misiones-lista');
+            lista.innerHTML = u.misiones.map(m => {
+                const hoy = Math.floor((new Date().setHours(0,0,0,0) - m.inicio) / 86400000) + 1;
+                let grid = "";
+                for(let i=1; i<=21; i++) {
+                    let st = i > hoy ? "locked" : (m.logs.includes(i) ? "complete" : "");
+                    if(i === hoy) st += " today";
+                    grid += `<div class="circle ${st}" onclick="marcarDia(${m.id}, ${i})">${i}</div>`;
+                }
+                return `<div class="mision-card"><div class="mision-tag">${ICONOS[m.categoria]||'🎯'} ${m.categoria}</div><h3>${m.nombre}</h3><div class="grid-21">${grid}</div></div>`;
+            }).join('');
+
+            const muro = document.getElementById('muro-contenido');
+            muro.innerHTML = Object.entries(db.usuarios).sort((a,b)=>b[1].xp-a[1].xp).map(([n, d])=>`<div class="muro-item"><span>${d.avatar} ${n}</span><span>LVL ${Math.floor(d.xp/500)+1}</span></div>`).join('');
+        }
+        render();
+    </script>
+</body>
+</html>
