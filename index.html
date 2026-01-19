@@ -20,6 +20,19 @@
             background: var(--card); padding: 20px; border-bottom: 3px solid var(--primary);
             position: sticky; top: 0; z-index: 100;
         }
+
+        .top-shield-container {
+            display: flex; justify-content: center; margin-bottom: 10px;
+        }
+        .holy-shield-btn {
+            width: 45px; height: 50px; background: #3b82f6; 
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border: 2px solid white; font-size: 1.5rem;
+            box-shadow: 0 0 15px rgba(59,130,246,0.5); transition: transform 0.2s;
+        }
+        .holy-shield-btn:hover { transform: scale(1.1); }
+
         .user-info { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
         .avatar { width: 60px; height: 60px; background: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 2px solid var(--gold); cursor: pointer; }
         
@@ -34,6 +47,30 @@
 
         .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
 
+        /* MODAL PAUSA SAGRADA Y RESPIRACIÓN */
+        #modalPausa {
+            display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.98); 
+            z-index: 2000; padding: 20px; overflow-y: auto;
+        }
+        .pausa-card {
+            background: var(--card); border-radius: 20px; padding: 25px; 
+            max-width: 500px; margin: 20px auto; border: 2px solid var(--primary);
+            text-align: center;
+        }
+        .pausa-title { color: var(--primary); font-size: 1.5rem; margin-bottom: 15px; justify-content: center; display: flex; align-items: center; gap: 10px; }
+        
+        /* CIRCULO DE RESPIRACIÓN */
+        .breath-container { position: relative; width: 200px; height: 200px; margin: 30px auto; display: flex; align-items: center; justify-content: center; }
+        .breath-circle {
+            width: 100px; height: 100px; background: var(--primary); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column; transition: all 1s linear;
+            box-shadow: 0 0 30px var(--primary);
+        }
+        #breath-text { font-weight: bold; font-size: 1.2rem; margin-bottom: 5px; }
+        #breath-timer { font-size: 2rem; font-weight: 900; }
+        .recom-text { font-size: 0.75rem; color: var(--gold); margin-top: 15px; font-style: italic; opacity: 0.9; }
+
         /* MANUAL Y GUÍA PASO A PASO */
         .manual-btn {
             background: linear-gradient(135deg, #1e293b, #334155); color: var(--gold); 
@@ -46,6 +83,7 @@
         }
         .prog-box { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-top: 10px; }
         .prog-box h4 { margin-bottom: 5px; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
+        .cat-def { font-size: 0.75rem; color: #94a3b8; font-style: italic; margin-bottom: 8px; display: block; line-height: 1.3; }
         .prog-box ul { padding-left: 20px; font-size: 0.8rem; color: #cbd5e1; }
         
         .step-guide { border-top: 1px solid #334155; margin-top: 15px; padding-top: 15px; }
@@ -87,6 +125,25 @@
 </head>
 <body>
 
+    <div id="modalPausa">
+        <div class="pausa-card">
+            <div class="pausa-title">🛡️ Pausa Sagrada</div>
+            <p style="font-size: 0.9rem; color: #cbd5e1;">Recupera tu centro con el ritmo 4-7-8.</p>
+            
+            <div class="breath-container">
+                <div class="breath-circle" id="breath-circle">
+                    <span id="breath-text">Inicia</span>
+                    <span id="breath-timer">-</span>
+                </div>
+            </div>
+
+            <p class="recom-text">💡 Recomendación: Repetir 4 veces este ciclo para máximo efecto.</p>
+
+            <button onclick="startBreathing()" id="btnStartBreath" style="width:100%; padding:12px; border-radius:8px; border:none; background:var(--primary); color:white; font-weight:bold; cursor:pointer; margin-top:20px;">COMENZAR EJERCICIO</button>
+            <button onclick="closePausa()" class="btn-close" style="width:100%; margin-top:10px;">CERRAR</button>
+        </div>
+    </div>
+
     <div id="panelVigilancia">
         <div class="vigilancia-header">
             <h2 style="color: var(--gold);">🕵️ Panel de Vigilancia</h2>
@@ -99,6 +156,10 @@
     </div>
 
     <div class="header-stats">
+        <div class="top-shield-container">
+            <div class="holy-shield-btn" onclick="openPausa()">🛡️</div>
+        </div>
+
         <div class="user-info">
             <div class="avatar" id="current-avatar" onclick="checkSecret()">🛡️</div>
             <div class="stat-bars">
@@ -124,26 +185,36 @@
                 <div class="step"><b>5.</b> ¡Gana XP para subir de nivel y aparecer en el Muro de la Fama!</div>
             </div>
 
-            <h5 style="color: var(--gold); font-size: 0.9rem; margin-top: 20px;">🎯 Objetivos por Categoría</h5>
+            <h5 style="color: var(--gold); font-size: 0.9rem; margin-top: 20px;">🎯 Definiciones y Objetivos</h5>
+            
             <div class="prog-box">
                 <h4 style="color: #10b981;">⚖️ RESPONSABILIDAD</h4>
-                <ul><li>Puntualidad extrema.</li><li>Cero excusas.</li></ul>
+                <span class="cat-def">Capacidad de responder por nuestros actos y cumplir compromisos sin necesidad de supervisión externa.</span>
+                <ul><li>Puntualidad extrema (llegar 5 min antes).</li><li>Cero excusas (asumir errores de inmediato).</li></ul>
             </div>
+
             <div class="prog-box">
                 <h4 style="color: #6366f1;">🛡️ AUTODOMINIO</h4>
-                <ul><li>Pausa Sagrada.</li><li>Ayuno digital.</li></ul>
+                <span class="cat-def">Poder sobre los propios impulsos, emociones y deseos para actuar bajo la razón y no el instinto.</span>
+                <ul><li>Pausa Sagrada (respirar ante el estrés).</li><li>Ayuno digital (una hora sin celular al despertar).</li></ul>
             </div>
+
             <div class="prog-box">
                 <h4 style="color: #f59e0b;">🧹 ORDEN</h4>
-                <ul><li>Regla del Minuto.</li><li>Escritorio limpio.</li></ul>
+                <span class="cat-def">Estructura externa que facilita la claridad mental. Significa que cada cosa tiene un lugar y un momento.</span>
+                <ul><li>Regla del Minuto (si toma < 1 min, hazlo ya).</li><li>Escritorio limpio al terminar el día.</li></ul>
             </div>
+
             <div class="prog-box">
                 <h4 style="color: #38bdf8;">💎 INTEGRIDAD</h4>
-                <ul><li>Verdad total.</li><li>Lealtad a ausentes.</li></ul>
+                <span class="cat-def">Hacer lo correcto incluso cuando nadie está mirando. Coherencia total entre lo que piensas, dices y haces.</span>
+                <ul><li>Verdad total (no omitir información).</li><li>Lealtad a ausentes (no hablar mal de quien no está).</li></ul>
             </div>
+
             <div class="prog-box">
                 <h4 style="color: #a855f7;">📚 APRENDIZAJE</h4>
-                <ul><li>Leer 10 págs/día.</li><li>Escribir aprendizaje.</li></ul>
+                <span class="cat-def">Curiosidad activa y humildad para reconocer que siempre podemos mejorar nuestras habilidades y conocimientos.</span>
+                <ul><li>Leer 10 págs/día de un libro formativo.</li><li>Escribir un aprendizaje clave antes de dormir.</li></ul>
             </div>
         </div>
 
@@ -160,6 +231,72 @@
     </div>
 
     <script>
+        // --- LÓGICA DE RESPIRACIÓN 4-7-8 CON METRÓNOMO ---
+        let breathing = false;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playTick(freq, vol, dur) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
+            osc.start();
+            osc.stop(audioCtx.currentTime + dur);
+        }
+
+        function openPausa() { document.getElementById('modalPausa').style.display = 'block'; }
+        function closePausa() { 
+            document.getElementById('modalPausa').style.display = 'none'; 
+            breathing = false; 
+        }
+
+        async function runStep(label, seconds, color, scale, freq) {
+            if(!breathing) return;
+            const circle = document.getElementById('breath-circle');
+            const txt = document.getElementById('breath-text');
+            const timer = document.getElementById('breath-timer');
+
+            txt.innerText = label;
+            circle.style.background = color;
+            circle.style.transform = `scale(${scale})`;
+            
+            for(let s = seconds; s > 0; s--) {
+                if(!breathing) break;
+                timer.innerText = s;
+                if (s === seconds) playTick(freq, 0.2, 0.1); 
+                else playTick(800, 0.05, 0.05);
+                
+                await new Promise(r => setTimeout(r, 1000));
+            }
+        }
+
+        async function startBreathing() {
+            if(breathing) return;
+            breathing = true;
+            document.getElementById('btnStartBreath').style.display = 'none';
+
+            for(let i=0; i<4; i++) {
+                if(!breathing) break;
+                await runStep("INHALA", 4, "var(--xp)", 1.8, 440);
+                await runStep("MANTÉN", 7, "var(--gold)", 1.8, 554);
+                await runStep("EXHALA", 8, "var(--hp)", 1.0, 330);
+            }
+            
+            if(breathing) {
+                document.getElementById('breath-text').innerText = "LISTO";
+                document.getElementById('breath-timer').innerText = "🧘";
+                document.getElementById('breath-circle').style.background = "var(--primary)";
+                confetti({ particleCount: 50 });
+            }
+            
+            document.getElementById('btnStartBreath').style.display = 'block';
+            breathing = false;
+        }
+
+        // --- LÓGICA ORIGINAL SIN CAMBIOS ---
         const CATEGORIAS = ["Responsabilidad", "Autodominio", "Orden", "Integridad", "Aprendizaje"];
         
         let db = JSON.parse(localStorage.getItem('heroes_final_v12')) || {
