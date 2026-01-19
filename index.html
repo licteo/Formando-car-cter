@@ -45,16 +45,15 @@
 
         .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
 
-        /* SECCIÓN DE AYUDA / MANUAL */
-        .manual-container { margin-bottom: 20px; }
+        /* MANUAL */
         .manual-btn {
             background: linear-gradient(135deg, #1e293b, #334155); color: var(--gold); 
             border: 1px solid var(--gold); width: 100%; padding: 12px; border-radius: 12px;
-            font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+            font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px;
         }
         #manualContent {
             display: none; background: #1e293b; padding: 20px; border-radius: 12px;
-            margin-top: 10px; border-left: 4px solid var(--gold); font-size: 0.9rem;
+            margin-bottom: 20px; border-left: 4px solid var(--gold); font-size: 0.9rem;
         }
         .prog-box { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-top: 10px; }
         .prog-box h4 { color: var(--xp); margin-bottom: 5px; font-size: 0.85rem; }
@@ -65,7 +64,13 @@
             background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 20px;
             border: 1px solid #334155; position: relative;
         }
-        .mision-tag { position: absolute; top: 0; right: 20px; background: var(--primary); padding: 4px 10px; border-radius: 0 0 8px 8px; font-size: 0.6rem; font-weight: bold; }
+        .mision-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .mision-actions { display: flex; gap: 10px; }
+        .btn-action { background: none; border: none; cursor: pointer; font-size: 1.1rem; opacity: 0.6; transition: 0.3s; }
+        .btn-action:hover { opacity: 1; transform: scale(1.2); }
+
+        .mision-tag { background: var(--primary); padding: 4px 10px; border-radius: 8px; font-size: 0.6rem; font-weight: bold; display: inline-block; margin-bottom: 5px; }
+        
         .grid-21 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 15px; }
         .circle {
             aspect-ratio: 1; border-radius: 8px; background: #334155; display: flex;
@@ -75,12 +80,12 @@
         .circle.today { border: 2px solid var(--gold); animation: pulse 2s infinite; }
         .circle.locked { opacity: 0.2; cursor: default; }
 
-        /* PAUSA OVERLAY */
+        /* PAUSA */
         #pausaOverlay {
             display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.98); 
             z-index: 1000; flex-direction: column; align-items: center; justify-content: center;
         }
-        .timer-circle { width: 200px; height: 200px; border-radius: 50%; border: 8px solid var(--primary); display: flex; align-items: center; justify-content: center; transition: 0.5s; }
+        .timer-circle { width: 180px; height: 180px; border-radius: 50%; border: 8px solid var(--primary); display: flex; align-items: center; justify-content: center; transition: 0.5s; margin: 20px 0; }
         .timer-num { font-size: 4rem; font-weight: bold; }
 
         .fab-pausa {
@@ -107,7 +112,7 @@
         <div class="user-info">
             <div class="avatar" id="current-avatar" onclick="clicAvatar()">🛡️</div>
             <div class="stat-bars">
-                <h2 id="current-user-name">Héroe</h2>
+                <h2 id="current-user-name">Cargando...</h2>
                 <div class="bar-label"><span>Rango: <span id="rango-txt">-</span></span> <span>Nivel <span id="lvl-txt">1</span></span></div>
                 <div class="bar-bg"><div id="xp-bar" class="bar-fill" style="background: var(--xp); width: 0%;"></div></div>
                 <div class="bar-label"><span>Energía Vital (HP)</span> <span id="hp-txt">100%</span></div>
@@ -119,42 +124,28 @@
 
     <div id="panelPadre">
         <h2 style="color: var(--gold); margin-bottom: 15px;">🔍 Registro de Actividad</h2>
-        <button onclick="document.getElementById('panelPadre').style.display='none'" class="perfil-btn" style="background: var(--hp); margin-bottom: 15px;">Cerrar Panel</button>
-        <button onclick="limpiarLogs()" class="perfil-btn" style="background: #555; margin-bottom: 15px;">Borrar Historial</button>
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <button onclick="document.getElementById('panelPadre').style.display='none'" class="perfil-btn" style="background: var(--hp);">Cerrar</button>
+            <button onclick="limpiarLogs()" class="perfil-btn" style="background: #555;">Borrar Logs</button>
+        </div>
         <div id="listaLogs"></div>
     </div>
 
     <div class="container">
-        <div class="manual-container">
-            <button class="manual-btn" onclick="toggleManual()">📜 MANUAL Y GUÍA DE MISIONES</button>
-            <div id="manualContent">
-                <p>Bienvenido, Guerrero. Aquí tienes tus objetivos por categoría:</p>
-                <div class="prog-box">
-                    <h4>⚖️ RESPONSABILIDAD</h4>
-                    <ul><li>Puntualidad extrema (5 min antes).</li><li>Cero excusas: "Yo soy el responsable".</li><li>Cumplir promesas sin recordatorios.</li></ul>
-                </div>
-                <div class="prog-box">
-                    <h4>🛡️ AUTODOMINIO</h4>
-                    <ul><li>Pausa Sagrada ante el estrés.</li><li>Ayuno digital (2h sin cel al despertar).</li><li>Ducha fría para templar el ánimo.</li></ul>
-                </div>
-                <div class="prog-box">
-                    <h4>🧹 ORDEN</h4>
-                    <ul><li>Regla del Minuto (si es rápido, hazlo ya).</li><li>Cocina y escritorio limpios al dormir.</li><li>Ropa y agenda lista la noche anterior.</li></ul>
-                </div>
-                <div class="prog-box">
-                    <h4>💎 INTEGRIDAD</h4>
-                    <ul><li>Verdad total (cero mentiras blancas).</li><li>Lealtad: Hablar bien de los ausentes.</li><li>Excelencia aunque nadie te vea.</li></ul>
-                </div>
-                <div class="prog-box">
-                    <h4>📚 APRENDIZAJE</h4>
-                    <ul><li>Leer 10 páginas de sabiduría al día.</li><li>Escuchar el doble de lo que hablas.</li><li>Escribir un aprendizaje cada noche.</li></ul>
-                </div>
-            </div>
+        <button class="manual-btn" onclick="toggleManual()">📜 MANUAL Y GUÍA DE MISIONES</button>
+        <div id="manualContent">
+            <p>Bienvenido, Guerrero. Aquí tienes tus objetivos por categoría:</p>
+            <div class="prog-box"><h4>⚖️ RESPONSABILIDAD</h4><ul><li>Puntualidad extrema.</li><li>Cero excusas.</li></ul></div>
+            <div class="prog-box"><h4>🛡️ AUTODOMINIO</h4><ul><li>Pausa Sagrada.</li><li>Ayuno digital.</li></ul></div>
+            <div class="prog-box"><h4>🧹 ORDEN</h4><ul><li>Regla del Minuto.</li><li>Escritorio limpio.</li></ul></div>
+            <div class="prog-box"><h4>💎 INTEGRIDAD</h4><ul><li>Verdad total.</li><li>Lealtad a ausentes.</li></ul></div>
+            <div class="prog-box"><h4>📚 APRENDIZAJE</h4><ul><li>Leer 10 págs/día.</li><li>Escribir aprendizaje.</li></ul></div>
         </div>
 
         <button onclick="crearMision()" style="width:100%; padding:15px; border-radius:12px; border:2px dashed var(--primary); background:none; color:var(--primary); font-weight:bold; cursor:pointer; margin-bottom:20px;">
             + INICIAR NUEVA MISIÓN
         </button>
+
         <div id="misiones-lista"></div>
 
         <div class="muro">
@@ -170,7 +161,7 @@
         <div class="timer-circle" id="circuloAnim">
             <div class="timer-num" id="contadorPausa">0</div>
         </div>
-        <div id="instruccionPausa" style="font-size: 1.2rem; color: var(--xp); text-align: center; padding: 0 20px;">¿Listo para recuperar HP?</div>
+        <div id="instruccionPausa" style="font-size: 1.2rem; color: var(--xp); text-align: center; padding: 0 20px;">Recupera tu energía vital...</div>
         <button id="btnStartRespirar" onclick="iniciarCiclo478()" style="margin-top:20px; padding:12px 30px; border-radius:25px; border:none; background:var(--primary); color:white; font-weight:bold; cursor:pointer;">EMPEZAR</button>
     </div>
 
@@ -178,132 +169,119 @@
         const ICONOS = { "Autodominio": "🛡️", "Orden": "🧹", "Responsabilidad": "⚖️", "Integridad": "💎", "Aprendizaje": "📚" };
         const RANGOS = ["Novato", "Aprendiz", "Guerrero", "Caballero", "Maestro", "Leyenda"];
         
-        let db = JSON.parse(localStorage.getItem('heroes_caracter_v5')) || {
+        let db = JSON.parse(localStorage.getItem('heroes_caracter_v6')) || {
             usuarios: {
-                "Alexander": { xp: 0, hp: 100, misiones: [], avatar: "🦁" },
-                "Liliana": { xp: 0, hp: 100, misiones: [], avatar: "🦋" },
-                "Steven": { xp: 0, hp: 100, misiones: [], avatar: "🦅" },
-                "Alison": { xp: 0, hp: 100, misiones: [], avatar: "🦊" }
+                "Papá": { xp: 0, hp: 100, misiones: [], avatar: "🦁" },
+                "Mamá": { xp: 0, hp: 100, misiones: [], avatar: "🦋" },
+                "Hijo 1": { xp: 0, hp: 100, misiones: [], avatar: "🦅" },
+                "Hijo 2": { xp: 0, hp: 100, misiones: [], avatar: "🦊" }
             },
-            actual: "Alexander"
+            actual: "Papá"
         };
 
         let logsPadre = JSON.parse(localStorage.getItem('logs_heroes')) || [];
 
         function registrarLog(accion) {
-            const entrada = {
-                fecha: new Date().toLocaleString(),
-                usuario: db.actual,
-                accion: accion
-            };
-            logsPadre.unshift(entrada);
+            logsPadre.unshift({ fecha: new Date().toLocaleString(), usuario: db.actual, accion });
             if(logsPadre.length > 100) logsPadre.pop();
             localStorage.setItem('logs_heroes', JSON.stringify(logsPadre));
         }
 
-        let cuentaClicsAvatar = 0;
-        function clicAvatar() {
-            cuentaClicsAvatar++;
-            if(cuentaClicsAvatar >= 3) {
-                mostrarPanelPadre();
-                cuentaClicsAvatar = 0;
+        // --- FUNCIONES DE MISIÓN (EDITAR / ELIMINAR) ---
+        
+        function borrarMision(id) {
+            const u = db.usuarios[db.actual];
+            const mIndex = u.misiones.findIndex(m => m.id === id);
+            if(mIndex > -1 && confirm(`¿Estás seguro de eliminar "${u.misiones[mIndex].nombre}"? Perderás el progreso visual.`)) {
+                registrarLog(`Eliminó misión: ${u.misiones[mIndex].nombre}`);
+                u.misiones.splice(mIndex, 1);
+                guardar();
             }
-            setTimeout(() => cuentaClicsAvatar = 0, 2000);
+        }
+
+        function editarMision(id) {
+            const u = db.usuarios[db.actual];
+            const m = u.misiones.find(m => m.id === id);
+            const nuevoNombre = prompt("Nuevo nombre de la misión:", m.nombre);
+            if(!nuevoNombre) return;
+            const nuevaCat = prompt("Nueva categoría (Autodominio, Orden, Responsabilidad, Integridad, Aprendizaje):", m.categoria);
+            if(!nuevaCat) return;
+            
+            registrarLog(`Editó misión: ${m.nombre} -> ${nuevoNombre}`);
+            m.nombre = nuevoNombre;
+            m.categoria = nuevaCat;
+            guardar();
+        }
+
+        // --- SISTEMA CORE ---
+
+        function toggleManual() {
+            const c = document.getElementById('manualContent');
+            c.style.display = c.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function clicAvatar() {
+            this.clics = (this.clics || 0) + 1;
+            if(this.clics >= 3) { mostrarPanelPadre(); this.clics = 0; }
+            setTimeout(() => this.clics = 0, 2000);
         }
 
         function mostrarPanelPadre() {
             const lista = document.getElementById('listaLogs');
-            lista.innerHTML = logsPadre.map(l => `
-                <div class="log-entry">
-                    <b>${l.fecha}</b> | <span style="color:var(--primary)">${l.usuario}</span><br>
-                    ${l.accion}
-                </div>
-            `).join('') || "<p style='padding:10px'>Sin registros.</p>";
+            lista.innerHTML = logsPadre.map(l => `<div class="log-entry"><b>${l.fecha}</b> [${l.usuario}]: ${l.accion}</div>`).join('') || "Sin logs.";
             document.getElementById('panelPadre').style.display = 'block';
         }
 
-        function limpiarLogs() {
-            if(confirm("¿Borrar historial?")) {
-                logsPadre = [];
-                localStorage.removeItem('logs_heroes');
-                mostrarPanelPadre();
-            }
-        }
+        function limpiarLogs() { if(confirm("¿Borrar historial?")) { logsPadre = []; localStorage.removeItem('logs_heroes'); mostrarPanelPadre(); } }
 
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playTick(freq) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.frequency.value = freq;
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.1);
-        }
-
-        function toggleManual() {
-            const content = document.getElementById('manualContent');
-            content.style.display = content.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function guardar() {
-            localStorage.setItem('heroes_caracter_v5', JSON.stringify(db));
-            render();
-        }
+        function guardar() { localStorage.setItem('heroes_caracter_v6', JSON.stringify(db)); render(); }
 
         function crearMision() {
-            const nombre = prompt("Nombre de la Misión (ej: Puntualidad):");
-            const cat = prompt("Categoría: Autodominio, Orden, Responsabilidad, Integridad o Aprendizaje");
-            if(!nombre || !cat) return;
-            db.usuarios[db.actual].misiones.push({
-                id: Date.now(), nombre, categoria: cat, inicio: new Date().setHours(0,0,0,0), logs: []
-            });
-            registrarLog(`Inició misión: ${nombre}`);
-            guardar();
-        }
-
-        function marcarDia(misionId, dia) {
-            const u = db.usuarios[db.actual];
-            const m = u.misiones.find(x => x.id === misionId);
-            const hoy = Math.floor((new Date().setHours(0,0,0,0) - m.inicio) / 86400000) + 1;
-            
-            if(dia > hoy) return;
-            if(!m.logs.includes(dia)) {
-                m.logs.push(dia);
-                u.xp += 100;
-                registrarLog(`Completó día ${dia} de ${m.nombre}`);
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.8 } });
+            const n = prompt("Nombre de la misión:");
+            const c = prompt("Categoría (Autodominio, Orden, Responsabilidad, Integridad, Aprendizaje):");
+            if(n && c) {
+                db.usuarios[db.actual].misiones.push({ id: Date.now(), nombre: n, categoria: c, inicio: new Date().setHours(0,0,0,0), logs: [] });
+                registrarLog(`Nueva misión: ${n}`);
+                guardar();
             }
+        }
+
+        function marcarDia(mId, dia) {
+            const u = db.usuarios[db.actual], m = u.misiones.find(x => x.id === mId);
+            const hoy = Math.floor((new Date().setHours(0,0,0,0) - m.inicio) / 86400000) + 1;
+            if(dia > hoy || m.logs.includes(dia)) return;
+            m.logs.push(dia); u.xp += 100;
+            registrarLog(`Día ${dia} completado en ${m.nombre}`);
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.8 } });
             guardar();
         }
 
-        function abrirPausa() { 
-            document.getElementById('pausaOverlay').style.display = 'flex';
+        // --- PAUSA SAGRADA ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playTick(f) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+            o.connect(g); g.connect(audioCtx.destination);
+            o.frequency.value = f; g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
+            o.start(); o.stop(audioCtx.currentTime + 0.1);
         }
+
+        function abrirPausa() { document.getElementById('pausaOverlay').style.display = 'flex'; }
 
         async function iniciarCiclo478() {
             document.getElementById('btnStartRespirar').style.display = 'none';
             const cont = document.getElementById('contadorPausa'), inst = document.getElementById('instruccionPausa'), circ = document.getElementById('circuloAnim');
-            
             for(let c=0; c<2; c++) {
-                inst.innerText = "INHALA POR LA NARIZ"; circ.style.transform = "scale(1.3)"; circ.style.borderColor = "#10b981";
+                inst.innerText = "INHALA"; circ.style.transform = "scale(1.3)"; circ.style.borderColor = "#10b981";
                 for(let i=1; i<=4; i++) { cont.innerText = i; playTick(440); await new Promise(r => setTimeout(r, 1000)); }
-                
-                inst.innerText = "MANTÉN EL AIRE"; circ.style.borderColor = "#f59e0b";
+                inst.innerText = "MANTÉN"; circ.style.borderColor = "#f59e0b";
                 for(let i=1; i<=7; i++) { cont.innerText = i; playTick(554); await new Promise(r => setTimeout(r, 1000)); }
-                
-                inst.innerText = "EXHALA POR LA BOCA"; circ.style.transform = "scale(1)"; circ.style.borderColor = "#6366f1";
+                inst.innerText = "EXHALA"; circ.style.transform = "scale(1)"; circ.style.borderColor = "#6366f1";
                 for(let i=1; i<=8; i++) { cont.innerText = i; playTick(330); await new Promise(r => setTimeout(r, 1000)); }
             }
-            
             db.usuarios[db.actual].hp = Math.min(100, db.usuarios[db.actual].hp + 10);
-            inst.innerText = "¡ENERGÍA RECUPERADA!";
-            registrarLog("Completó Pausa Sagrada (+10 HP)");
-            guardar();
-            setTimeout(() => { 
-                document.getElementById('pausaOverlay').style.display = 'none'; 
-                document.getElementById('btnStartRespirar').style.display = 'block'; 
-            }, 2000);
+            inst.innerText = "¡+10 HP!"; registrarLog("Pausa Sagrada completada"); guardar();
+            setTimeout(() => { document.getElementById('pausaOverlay').style.display = 'none'; document.getElementById('btnStartRespirar').style.display = 'block'; }, 2000);
         }
 
         function render() {
@@ -317,31 +295,40 @@
             document.getElementById('hp-bar').style.width = `${u.hp}%`;
             document.getElementById('hp-txt').innerText = u.hp + "%";
 
-            const selector = document.getElementById('perfil-selector');
-            selector.innerHTML = Object.keys(db.usuarios).map(n => 
+            document.getElementById('perfil-selector').innerHTML = Object.keys(db.usuarios).map(n => 
                 `<button class="perfil-btn ${n===db.actual?'active':''}" onclick="db.actual='${n}'; render();">${n}</button>`
             ).join('');
 
-            const lista = document.getElementById('misiones-lista');
-            lista.innerHTML = u.misiones.map(m => {
+            document.getElementById('misiones-lista').innerHTML = u.misiones.map(m => {
                 const hoy = Math.floor((new Date().setHours(0,0,0,0) - m.inicio) / 86400000) + 1;
-                let grid = "";
+                let circles = "";
                 for(let i=1; i<=21; i++) {
                     let st = i > hoy ? "locked" : (m.logs.includes(i) ? "complete" : "");
                     if(i === hoy && !m.logs.includes(i)) st += " today";
-                    grid += `<div class="circle ${st}" onclick="marcarDia(${m.id}, ${i})">${i}</div>`;
+                    circles += `<div class="circle ${st}" onclick="marcarDia(${m.id}, ${i})">${i}</div>`;
                 }
-                return `<div class="mision-card"><div class="mision-tag">${ICONOS[m.categoria]||'🎯'} ${m.categoria}</div><h3>${m.nombre}</h3><div class="grid-21">${grid}</div></div>`;
+                return `
+                <div class="mision-card">
+                    <div class="mision-header">
+                        <div>
+                            <div class="mision-tag">${ICONOS[m.categoria]||'🎯'} ${m.categoria}</div>
+                            <h3>${m.nombre}</h3>
+                        </div>
+                        <div class="mision-actions">
+                            <button class="btn-action" onclick="editarMision(${m.id})">✏️</button>
+                            <button class="btn-action" onclick="borrarMision(${m.id})">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="grid-21">${circles}</div>
+                </div>`;
             }).join('');
 
-            const muro = document.getElementById('muro-contenido');
-            muro.innerHTML = Object.entries(db.usuarios)
+            document.getElementById('muro-contenido').innerHTML = Object.entries(db.usuarios)
                 .sort((a,b)=>b[1].xp-a[1].xp)
-                .map(([n, d])=>`<div class="muro-item"><span>${d.avatar} ${n}</span><span>LVL ${Math.floor(d.xp/500)+1}</span></div>`)
-                .join('');
+                .map(([n, d])=>`<div class="muro-item"><span>${d.avatar} ${n}</span><span>LVL ${Math.floor(d.xp/500)+1}</span></div>`).join('');
         }
         
-        window.onload = () => render();
+        window.onload = render;
     </script>
 </body>
 </html>
